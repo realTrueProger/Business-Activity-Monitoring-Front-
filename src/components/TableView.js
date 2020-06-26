@@ -17,6 +17,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from "@material-ui/core/Button";
+import ErrorBoundary from "./ErrorBoundary";
 
 
 const TableView = (props) => {
@@ -213,14 +214,30 @@ const TableView = (props) => {
                 .filter(history =>
                     history.scope === rowData.id)
                 .forEach(el => {
-                    resultVars.push({name: vrb.name, tz: el.timeZone , value: el.value, type: el.type, time:el.time, id: el.id, scope: 'activity'})
+                    resultVars.push({
+                        name: vrb.name,
+                        tz: el.timeZone,
+                        value: el.value,
+                        type: el.type,
+                        time: el.time,
+                        id: el.id,
+                        scope: 'activity'
+                    })
                 });
 
             vrb.variableHistoriesById
                 .filter(history =>
                     history.scope !== rowData.id && Date.parse(history.time) >= activityStart && Date.parse(history.time) <= activityEnd)
                 .forEach(el => {
-                    resultVars.push({name: vrb.name, tz: el.timeZone , value: el.value, type: el.type, time:el.time, id: el.id, scope: 'process'})
+                    resultVars.push({
+                        name: vrb.name,
+                        tz: el.timeZone,
+                        value: el.value,
+                        type: el.type,
+                        time: el.time,
+                        id: el.id,
+                        scope: 'process'
+                    })
                 });
         });
 
@@ -270,18 +287,23 @@ const TableView = (props) => {
     };
 
     return (
-        <MaterialTable
-            title={tableData[table].name}
-            columns={tableData[table].headers}
-            data={rows}
-            options={{
-                filtering: true,
-                pageSize: 10,
-                draggable: false
-            }}
-            isLoading={loading}
-            detailPanel={showPanel()}
-        />
+        <>
+            <ErrorBoundary>
+                <MaterialTable
+                    key={tableData[table].name}
+                    title={tableData[table].name}
+                    columns={tableData[table].headers}
+                    data={rows}
+                    options={{
+                        filtering: true,
+                        pageSize: 10,
+                        draggable: false
+                    }}
+                    isLoading={loading}
+                    detailPanel={showPanel()}
+                />
+            </ErrorBoundary>
+        </>
     )
 };
 
