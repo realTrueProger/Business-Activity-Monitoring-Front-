@@ -5,7 +5,7 @@ export const getVariables = () => {
     return dispatch => {
         dispatch(getVariablesStarted());
 
-        axios
+        return axios
             .get(`${apiUrl}/variables`)
             .then(res => {
                 dispatch(getVariablesSuccess(res.data));

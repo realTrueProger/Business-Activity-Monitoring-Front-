@@ -1,10 +1,10 @@
-const activitiesDefaultState = {
+const initialState = {
     loading: false,
     error: null,
     rows: [],
 };
 
-export default (state = activitiesDefaultState, action) => {
+export default (state = initialState, action) => {
     switch (action.type) {
         case 'GET_ACTIVITIES_STARTED':
             return {

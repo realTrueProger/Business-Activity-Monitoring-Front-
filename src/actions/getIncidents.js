@@ -5,7 +5,7 @@ export const getIncidents = () => {
     return dispatch => {
         dispatch(getIncidentsStarted());
 
-        axios
+        return axios
             .get(`${apiUrl}/incidents`)
             .then(res => {
                 dispatch(getIncidentsSuccess(res.data));

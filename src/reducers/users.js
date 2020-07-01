@@ -1,10 +1,10 @@
-const usersDefaultState = {
+const initialState = {
     loading: false,
     error: null,
     rows: [],
 };
 
-export default (state = usersDefaultState, action) => {
+export default (state = initialState, action) => {
     switch (action.type) {
         case 'GET_USERS_STARTED':
             return {

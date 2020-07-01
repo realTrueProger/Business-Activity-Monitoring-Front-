@@ -5,7 +5,7 @@ export const getDefinitions = () => {
     return dispatch => {
         dispatch(getDefinitionsStarted());
 
-        axios
+        return axios
             .get(`${apiUrl}/processDefinitions`)
             .then(res => {
                 dispatch(getDefinitionsSuccess(res.data));

@@ -5,7 +5,7 @@ export const getTasks = () => {
     return dispatch => {
         dispatch(getTasksStarted());
 
-        axios
+        return axios
             .get(`${apiUrl}/tasks`)
             .then(res => {
                 dispatch(getTasksSuccess(res.data));

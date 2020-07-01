@@ -1,0 +1,47 @@
+image: node:latest
+
+stages:
+  - installDependencies
+  - build
+  - test
+  - check
+
+installDependencies:
+  stage: installDependencies
+  script:
+    - echo "Installing deps"
+    - cd prototype-bam-system-frontend/
+    - npm install
+  artifacts:
+    paths:
+      - prototype-bam-system-frontend/node_modules/
+    expire_in: 1 day
+
+build:
+  stage: build
+  script:
+    - echo "Building deploy package"
+    - cd prototype-bam-system-frontend/
+    - npm install
+    - npm build
+    - echo "Build successful"
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - prototype-bam-system-frontend/public
+
+test:
+  stage: test
+  script:
+    - echo "Start tests"
+    - cd prototype-bam-system-frontend/
+    - npm install
+    - npm test
+
+check:
+  stage: check
+  script:
+    - echo "Start code static check"
+    - cd prototype-bam-system-frontend/
+    - npm install
+    - npm run lint

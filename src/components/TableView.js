@@ -1,6 +1,7 @@
+/*eslint-disable react/display-name*/
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux'
-import {useParams, useHistory, Link, Redirect} from 'react-router-dom';
+import {useParams, useHistory, Link} from 'react-router-dom';
 import {getIncidents} from "../actions/getIncidents";
 import {getTasks} from "../actions/getTasks";
 import {getDefinitions} from "../actions/getDefinitions";
@@ -15,12 +16,10 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import Button from "@material-ui/core/Button";
 import ErrorBoundary from "./ErrorBoundary";
 
-
-const TableView = (props) => {
+const TableView = () => {
     let {id = "", table = 'definitions', insId = ""} = useParams();
     let variables = useSelector(state => state.variables.rows) || [];
     const dispatch = useDispatch();
@@ -30,10 +29,11 @@ const TableView = (props) => {
 
     try {
         const fromIncident = useHistory().location.state.fromIncident;
+        console.log(fromIncident);
         insId = id;
         id = "";
     } catch (e) {
-
+        console.log('');
     }
 
     useEffect(() => {

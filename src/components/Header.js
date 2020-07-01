@@ -5,7 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import {makeStyles} from '@material-ui/core/styles';
 import {Link} from 'react-router-dom';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     paper: {
         paddingLeft: '5px',
         marginTop: '1em',
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const Header = (props) => {
+const Header = () => {
     const classes = useStyles();
 
     return (

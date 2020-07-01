@@ -1,10 +1,10 @@
-const instancesDefaultState = {
+const initialState = {
     loading: false,
     error: null,
     rows: [],
 };
 
-export default (state = instancesDefaultState, action) => {
+export default (state = initialState, action) => {
     switch (action.type) {
         case 'GET_INSTANCES_STARTED':
             return {

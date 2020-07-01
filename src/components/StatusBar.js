@@ -2,7 +2,7 @@ import React from "react";
 import {Paper} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import { useSelector } from 'react-redux'
-import { compose, map, path, pick, prop } from 'ramda';
+import { compose, map, path, pick } from 'ramda';
 
 const useStyles = makeStyles(() => ({
     paper: {
@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const StatusBar = (props) => {
+const StatusBar = () => {
     const length = useSelector(compose(
         map(path(['rows', 'length'])),
         pick(['definitions', 'instances', 'tasks', 'incidents']),

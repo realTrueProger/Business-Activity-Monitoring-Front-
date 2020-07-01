@@ -5,7 +5,7 @@ export const getUsers = () => {
     return dispatch => {
         dispatch(getUsersStarted());
 
-        axios
+        return axios
             .get(`${apiUrl}/users`)
             .then(res => {
                 dispatch(getUsersSuccess(res.data));

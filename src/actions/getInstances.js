@@ -5,7 +5,7 @@ export const getInstances = () => {
     return dispatch => {
         dispatch(getInstancesStarted());
 
-        axios
+        return axios
             .get(`${apiUrl}/processInstances`)
             .then(res => {
                 dispatch(getInstancesSuccess(res.data));

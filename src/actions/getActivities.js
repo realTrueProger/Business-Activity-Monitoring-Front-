@@ -5,7 +5,7 @@ export const getActivities = () => {
     return dispatch => {
         dispatch(getActivitiesStarted());
 
-        axios
+        return axios
             .get(`${apiUrl}/activityInstances`)
             .then(res => {
                 dispatch(getActivitiesSuccess(res.data));
