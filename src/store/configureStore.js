@@ -7,6 +7,7 @@ import tasks from "../reducers/tasks";
 import users from "../reducers/users";
 import activities from "../reducers/activities";
 import variables from "../reducers/variables";
+import schema from "../reducers/schema";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -19,7 +20,8 @@ export default () => {
           tasks,
           users,
           activities,
-          variables
+          variables,
+          schema
       }),
       composeEnhancers(applyMiddleware(thunk)),
   );

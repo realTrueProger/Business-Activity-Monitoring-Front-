@@ -9,6 +9,7 @@ const useStyles = makeStyles(() => ({
         padding: '5px',
         marginTop: '1rem',
         marginBottom: '1rem',
+        fontSize: '14px',
     },
 }));
 

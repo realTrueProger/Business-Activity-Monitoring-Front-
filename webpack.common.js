@@ -18,6 +18,11 @@ module.exports = {
                 'css-loader',
                 'sass-loader'
             ]
+        }, {
+            test: /\.bpmn$/,
+            use: {
+                loader: 'raw-loader'
+            }
         }]
     },
 };

@@ -9,6 +9,7 @@ import {getInstances} from "../actions/getInstances";
 import {getUsers} from "../actions/getUsers";
 import {getActivities} from "../actions/getActivities";
 import {getVariables} from "../actions/getVariables";
+import {setSchema} from "../actions/setSchema";
 import MaterialTable from "material-table";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -33,7 +34,7 @@ const TableView = () => {
         insId = id;
         id = "";
     } catch (e) {
-        console.log('');
+        console.log('')
     }
 
     useEffect(() => {
@@ -60,6 +61,10 @@ const TableView = () => {
         }
     }, [table]);
 
+    const showSchema = (schema) => {
+        dispatch(setSchema(schema));
+    };
+
     const tableData = {
         definitions: {
             name: 'Process definitions',
@@ -78,7 +83,16 @@ const TableView = () => {
                 },
                 {title: 'deploymentId', field: 'deploymentId'},
                 {title: 'version', field: 'version'},
-                {title: 'schemaXml', field: 'schemaXml', emptyValue: 'null'}],
+                {
+                    title: 'schemaXml',
+                    field: 'schemaXml',
+                    emptyValue: 'null',
+                    render: rowData =>
+                        <Button
+                            onClick={() => showSchema(rowData.schemaXml)}
+                            variant="contained"
+                            color="primary">Show schema</Button>
+                }],
         },
         incidents: {
             name: 'Incidents',
