@@ -1,4 +1,5 @@
-export const setSchema = (schema) => ({
+export const setSchema = (schema = null, durations = {}) => ({
     type: 'SET_SCHEMA',
-    schema
+    schema,
+    durations
 });

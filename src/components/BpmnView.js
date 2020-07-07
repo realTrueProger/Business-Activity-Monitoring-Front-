@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Paper} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import { useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import BpmnViewer from 'bpmn-js';
 
 const useStyles = makeStyles(() => ({
@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
         marginBottom: '1rem',
     },
     bpmn: {
-        height: '300px',
+        height: '500px',
         padding: '10px',
         fontSize: '16px',
     }
@@ -21,6 +21,30 @@ const BpmnView = () => {
     const classes = useStyles();
     const container = React.createRef();
     let schema = useSelector(state => state.schema.schema);
+    let durations = useSelector(state => state.schema.durations);
+
+    const percent = (percent, total) => {
+        return ((percent / 100) * total).toFixed();
+    };
+
+    const buildHeatMap = (nodesRegistry, nodesDurations) => {
+        let p20 = percent(20, nodesDurations._MAX);
+        let p80 = percent(80, nodesDurations._MAX);
+
+        for (const [node, time] of Object.entries(nodesDurations)) {
+            if (node === '_MAX' || node.startsWith('SubProcess')) continue;
+
+            if (time < p20) {
+                nodesRegistry._elements[node].gfx.firstChild.firstChild.style.fill = 'green';
+            }
+            if (time >= p20 && time <= p80) {
+                nodesRegistry._elements[node].gfx.firstChild.firstChild.style.fill = 'yellow';
+            }
+            if (time >= p80) {
+                nodesRegistry._elements[node].gfx.firstChild.firstChild.style.fill = 'red';
+            }
+        }
+    };
 
     useEffect(() => {
         if (schema) {
@@ -30,22 +54,18 @@ const BpmnView = () => {
                 container: container.current
             });
 
-            viewer.importXML(schema).then(function(result) {
-                const { warnings } = result;
+            viewer.importXML(schema).then(function () {
                 viewer.get('canvas').zoom('fit-viewport');
 
-                let registry = viewer.get('elementRegistry');
-                let invoice = registry._elements.approveInvoice;
-                let reviewInvoice = registry._elements.reviewInvoice;
-                invoice.gfx.firstChild.firstChild.classList.add('green');
-                reviewInvoice.gfx.firstChild.firstChild.style.fill = 'red';
-
-            }).catch(function(err) {
-                const { warnings, message } = err;
+                if (durations) {
+                    buildHeatMap(viewer.get('elementRegistry'), durations);
+                }
+            }).catch(function (err) {
+                const {warnings, message} = err;
                 console.log('something went wrong with BPMN:', warnings, message);
             });
         }
-    }, [schema]);
+    }, [schema, durations]);
 
     return (
         <div>

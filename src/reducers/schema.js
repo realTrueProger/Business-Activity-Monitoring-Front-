@@ -1,5 +1,6 @@
 const initialState = {
-    schema: null
+    schema: null,
+    duration: null,
 };
 
 export default (state = initialState, action) => {
@@ -8,6 +9,7 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 schema: action.schema,
+                durations: action.durations
             };
         default :
             return {

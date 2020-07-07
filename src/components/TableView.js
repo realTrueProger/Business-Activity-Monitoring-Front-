@@ -28,13 +28,11 @@ const TableView = () => {
     const rows = useSelector(state => state[table].rows);
     const loading = useSelector(state => state[table].loading);
 
-    try {
+    if (useHistory().location.state) {
         const fromIncident = useHistory().location.state.fromIncident;
         console.log(fromIncident);
         insId = id;
         id = "";
-    } catch (e) {
-        console.log('')
     }
 
     useEffect(() => {
@@ -61,8 +59,27 @@ const TableView = () => {
         }
     }, [table]);
 
+    useEffect(() => {
+        dispatch(setSchema(null, {}));
+    }, [table]);
+
     const showSchema = (schema) => {
         dispatch(setSchema(schema));
+    };
+
+    const showHeatmap = (schema, activities) => {
+        let activitiesDurations = {};
+        let maxDuration = 0;
+
+        activities.forEach(activity => {
+            activitiesDurations[activity.activityId] = activity.durationInMillis;
+            if (activity.durationInMillis > maxDuration) {
+                activitiesDurations._MAX = activity.durationInMillis;
+                maxDuration = activity.durationInMillis;
+            }
+        });
+
+        dispatch(setSchema(schema, activitiesDurations));
     };
 
     const tableData = {
@@ -106,8 +123,9 @@ const TableView = () => {
                     field: 'processInstanceId',
                     render: rowData =>
                         <Link
-                            to={{pathname: `/instances/${rowData.id}`, state: {fromIncident: true}}}
-                        >{rowData.processInstanceId}</Link>
+                            to={{pathname: `/instances/${rowData.id}`, state: {fromIncident: true}}}>
+                            {rowData.processInstanceId}
+                        </Link>
                 },
                 {title: 'type', field: 'type'},
                 {title: 'message', field: 'message'},
@@ -129,7 +147,10 @@ const TableView = () => {
                 {
                     title: 'assignee',
                     field: 'assignee',
-                    render: rowData => <Link to={`/users/${rowData.assignee}`}>{rowData.assignee}</Link>
+                    render: rowData =>
+                        <Link to={`/users/${rowData.assignee}`}>
+                            {rowData.assignee}
+                        </Link>
                 },
                 {title: 'removalTime', field: 'removalTime'},
                 {title: 'dueTime', field: 'dueTime'},
@@ -146,14 +167,31 @@ const TableView = () => {
                     title: 'definitionId',
                     field: 'definitionId',
                     defaultFilter: id,
-                    render: rowData => <Link to={`/definitions/${rowData.definitionId}`}>{rowData.definitionId}</Link>
+                    render: rowData =>
+                        <Link to={`/definitions/${rowData.definitionId}`}>
+                            {rowData.definitionId}
+                        </Link>
                 },
                 {
                     title: 'getActivities',
                     field: 'getActivities',
-                    render: rowData => <Button variant="contained" color="primary"><Link className={'button-link'}
-                                                                                         to={`/activities/${rowData.id}`}>getActivities</Link></Button>
+                    render: rowData =>
+                        <Button variant="contained" color="primary">
+                            <Link
+                                className={'button-link'}
+                                to={`/activities/${rowData.id}`}
+                            >getActivities</Link>
+                        </Button>
                 },
+                {
+                    title: 'heatMap',
+                    field: 'getActivities',
+                    render: rowData => <Button
+                        onClick={() => showHeatmap(rowData.processDefinitionByDefinitionId.schemaXml, rowData.activityInstancesById)}
+                        variant="contained"
+                        color="primary">heatMap</Button>
+                },
+                {title: 'durationInMillis', field: 'durationInMillis'},
                 {
                     title: 'startUserId',
                     field: 'startUserId',
