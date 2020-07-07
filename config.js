@@ -1,1 +1,1 @@
-export const apiUrl = 'https://ancient-castle-04223.herokuapp.com';
+export const apiUrl = 'https://bam-back-end-api.herokuapp.com';

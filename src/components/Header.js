@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import {makeStyles} from '@material-ui/core/styles';
 import {Link} from 'react-router-dom';
+import BpmConfig from "./BpmConfig";
 
 const useStyles = makeStyles(() => ({
     paper: {
@@ -73,6 +74,9 @@ const Header = () => {
                                 color="primary"
                             >Users</Button>
                         </Link>
+                    </Grid>
+                    <Grid item>
+                        <BpmConfig />
                     </Grid>
                 </Grid>
             </Paper>

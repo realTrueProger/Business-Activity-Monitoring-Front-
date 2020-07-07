@@ -2,7 +2,10 @@ import React, {useEffect} from 'react';
 import {Paper} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {useSelector} from "react-redux";
-import BpmnViewer from 'bpmn-js';
+import BpmnNavigatedViewer from 'bpmn-js';
+import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
+import ZoomScrollModule from 'diagram-js/lib/navigation/zoomscroll';
+import TouchModule from 'diagram-js/lib/navigation/touch';
 
 const useStyles = makeStyles(() => ({
     paper: {
@@ -11,7 +14,7 @@ const useStyles = makeStyles(() => ({
         marginBottom: '1rem',
     },
     bpmn: {
-        height: '500px',
+        height: '400px',
         padding: '10px',
         fontSize: '16px',
     }
@@ -50,8 +53,13 @@ const BpmnView = () => {
         if (schema) {
             container.current.innerHTML = '';
 
-            const viewer = new BpmnViewer({
-                container: container.current
+            const viewer = new BpmnNavigatedViewer({
+                container: container.current,
+                additionalModules: [
+                    MoveCanvasModule,
+                    ZoomScrollModule,
+                    TouchModule
+                ]
             });
 
             viewer.importXML(schema).then(function () {

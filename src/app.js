@@ -6,12 +6,14 @@ import {Provider} from 'react-redux';
 import {getIncidents} from "./actions/getIncidents";
 import {getTasks} from "./actions/getTasks";
 import {getInstances} from "./actions/getInstances";
+import {getDefinitions} from "./actions/getDefinitions";
 import 'normalize.css/normalize.css';
 import './styles/styles.scss';
 import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
 
 const store = configureStore();
 
+store.dispatch(getDefinitions());
 store.dispatch(getIncidents());
 store.dispatch(getTasks());
 store.dispatch(getInstances());
@@ -22,7 +24,10 @@ const THEME = createMuiTheme({
         "fontSize": 10,
         "fontWeightLight": 300,
         "fontWeightRegular": 400,
-        "fontWeightMedium": 500
+        "fontWeightMedium": 500,
+        button: {
+            "textTransform": 'none'
+        }
     }
 });
 

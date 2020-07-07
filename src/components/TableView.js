@@ -19,6 +19,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Button from "@material-ui/core/Button";
 import ErrorBoundary from "./ErrorBoundary";
+import axios from 'axios';
+import {apiUrl} from "../../config";
 
 const TableView = () => {
     let {id = "", table = 'definitions', insId = ""} = useParams();
@@ -63,11 +65,12 @@ const TableView = () => {
         dispatch(setSchema(null, {}));
     }, [table]);
 
-    const showSchema = (schema) => {
-        dispatch(setSchema(schema));
+    const showSchema = (id) => {
+        axios.get(`${apiUrl}/processDefinitions/xml/${id}`)
+            .then(res => dispatch(setSchema(res.data.xml)));
     };
 
-    const showHeatmap = (schema, activities) => {
+    const showHeatmap = (definitionId, activities) => {
         let activitiesDurations = {};
         let maxDuration = 0;
 
@@ -79,7 +82,10 @@ const TableView = () => {
             }
         });
 
-        dispatch(setSchema(schema, activitiesDurations));
+        axios.get(`${apiUrl}/processDefinitions/xml/${definitionId}`)
+            .then(res => dispatch(setSchema(res.data.xml, activitiesDurations)));
+
+        //dispatch(setSchema(schema, activitiesDurations));
     };
 
     const tableData = {
@@ -103,10 +109,9 @@ const TableView = () => {
                 {
                     title: 'schemaXml',
                     field: 'schemaXml',
-                    emptyValue: 'null',
                     render: rowData =>
                         <Button
-                            onClick={() => showSchema(rowData.schemaXml)}
+                            onClick={() => showSchema(rowData.id)}
                             variant="contained"
                             color="primary">Show schema</Button>
                 }],
@@ -187,7 +192,7 @@ const TableView = () => {
                     title: 'heatMap',
                     field: 'getActivities',
                     render: rowData => <Button
-                        onClick={() => showHeatmap(rowData.processDefinitionByDefinitionId.schemaXml, rowData.activityInstancesById)}
+                        onClick={() => showHeatmap(rowData.definitionId, rowData.activityInstancesById)}
                         variant="contained"
                         color="primary">heatMap</Button>
                 },
@@ -219,11 +224,11 @@ const TableView = () => {
         activities: {
             name: 'Activities',
             headers: [
-                {title: 'id', field: 'id'},
                 {title: 'type', field: 'type'},
                 {title: 'name', field: 'name'},
-                {title: 'parentActivityInstanceId', field: 'parentActivityInstanceId'},
-                {title: 'activityId', field: 'activityId'},
+                {title: 'durationInMillis', field: 'durationInMillis'},
+                {title: 'startTime', field: 'startTime'},
+                {title: 'endTime', field: 'endTime'},
                 {
                     title: 'processInstanceId',
                     field: 'processInstanceId',
@@ -233,11 +238,9 @@ const TableView = () => {
                             to={{pathname: `/instances/${rowData.processInstanceId}`, state: {fromIncident: true}}}
                         >{rowData.processInstanceId}</Link>
                 },
-                {
-                    title: 'startTime',
-                    field: 'startTime',
-                },
-                {title: 'endTime', field: 'endTime'},
+                {title: 'id', field: 'id'},
+                {title: 'parentActivityInstanceId', field: 'parentActivityInstanceId'},
+                {title: 'activityId', field: 'activityId'},
                 {title: 'removalTime', field: 'removalTime'},
                 {title: 'canceled', field: 'canceled'},
                 {title: 'executionId', field: 'executionId'},
