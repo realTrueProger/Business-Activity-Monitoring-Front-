@@ -63,7 +63,7 @@ const BpmnView = () => {
             });
 
             viewer.importXML(schema).then(function () {
-                viewer.get('canvas').zoom('fit-viewport');
+                viewer.get('canvas').zoom('fit-viewport', 'auto');
 
                 if (durations) {
                     buildHeatMap(viewer.get('elementRegistry'), durations);

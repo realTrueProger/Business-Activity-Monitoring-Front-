@@ -14,6 +14,10 @@ const useStyles = makeStyles(() => ({
     header: {
         margin: '5px',
         marginRight: '20px',
+    },
+    lastGrid: {
+        marginLeft: 'auto',
+        marginRight: '1rem'
     }
 }));
 
@@ -75,7 +79,7 @@ const Header = () => {
                             >Users</Button>
                         </Link>
                     </Grid>
-                    <Grid item>
+                    <Grid item className={classes.lastGrid}>
                         <BpmConfig />
                     </Grid>
                 </Grid>

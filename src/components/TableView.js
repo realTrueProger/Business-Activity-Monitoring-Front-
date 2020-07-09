@@ -84,8 +84,6 @@ const TableView = () => {
 
         axios.get(`${apiUrl}/processDefinitions/xml/${definitionId}`)
             .then(res => dispatch(setSchema(res.data.xml, activitiesDurations)));
-
-        //dispatch(setSchema(schema, activitiesDurations));
     };
 
     const tableData = {

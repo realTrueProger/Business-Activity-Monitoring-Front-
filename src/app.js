@@ -9,7 +9,8 @@ import {getInstances} from "./actions/getInstances";
 import {getDefinitions} from "./actions/getDefinitions";
 import 'normalize.css/normalize.css';
 import './styles/styles.scss';
-import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
+import {MuiThemeProvider} from '@material-ui/core/styles';
+import theme from "./utils/materialTheme";
 
 const store = configureStore();
 
@@ -18,21 +19,8 @@ store.dispatch(getIncidents());
 store.dispatch(getTasks());
 store.dispatch(getInstances());
 
-const THEME = createMuiTheme({
-    typography: {
-        "fontFamily": `"Roboto", "Helvetica", "Arial", sans-serif`,
-        "fontSize": 10,
-        "fontWeightLight": 300,
-        "fontWeightRegular": 400,
-        "fontWeightMedium": 500,
-        button: {
-            "textTransform": 'none'
-        }
-    }
-});
-
 const jsx = (
-    <MuiThemeProvider theme={THEME}>
+    <MuiThemeProvider theme={theme}>
         <Provider store={store}>
             <AppRouter/>
         </Provider>

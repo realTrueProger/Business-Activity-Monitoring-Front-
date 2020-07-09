@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {TextField} from "@material-ui/core";
 import {Button} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
@@ -11,14 +11,15 @@ const useStyles = makeStyles(() => ({
         marginTop: '22px',
     },
     marginInput: {
-        marginTop: '5px'
+        marginTop: '5px',
+        minWidth: '225px',
     }
 }));
 
 const BpmConfig = () => {
     const classes = useStyles();
-    const [engineUrl, setEngineUrl] = useState('localhost:8081');
-    const [syncTime, setSyncTime] = useState('5');
+    const [engineUrl, setEngineUrl] = useState('fetching data...');
+    const [syncTime, setSyncTime] = useState('fetching data...');
     const updateEngineUrl = () => {
         axios.get(`${apiUrl}/engine?address=${engineUrl}`).then(res => console.log(res))
     };
@@ -26,12 +27,16 @@ const BpmConfig = () => {
         axios.get(`${apiUrl}/engine?sync=${syncTime}`).then(res => console.log(res))
     };
 
+    useEffect(() => {
+        axios.get(`${apiUrl}/engine/address`).then(res => setEngineUrl(res.data));
+        axios.get(`${apiUrl}/engine/sync`).then(res => setSyncTime(res.data));
+    }, []);
+
     return (
         <div>
             <TextField
                 className={classes.marginInput}
-                id="standard-basic"
-                label="Engine"
+                label="Engine:"
                 value={engineUrl}
                 onChange={(e) => setEngineUrl(e.target.value)}/>
             <Button className={classes.marginButton} variant="outlined" size={'small'} color="primary"
@@ -39,8 +44,7 @@ const BpmConfig = () => {
             <br/>
             <TextField
                 className={classes.marginInput}
-                id="standard-basic"
-                label="SyncTime"
+                label="SyncTime(sec):"
                 value={syncTime}
                 onChange={(e) => setSyncTime(e.target.value)}/>
             <Button className={classes.marginButton} variant="outlined" size={'small'} color="primary"
