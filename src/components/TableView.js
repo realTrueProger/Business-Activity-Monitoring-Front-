@@ -318,7 +318,7 @@ const TableView = () => {
                         {resultVars.map((v) => (
                             <TableRow hover key={v.id}>
                                 <TableCell>{v.name}</TableCell>
-                                <TableCell>{v.value || 'null'}</TableCell>
+                                <TableCell>{v.value ? v.value.value : null}</TableCell>
                                 <TableCell>{v.type}</TableCell>
                                 <TableCell>{v.scope}</TableCell>
                                 <TableCell>{v.time}</TableCell>
