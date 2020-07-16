@@ -1,3 +1,11 @@
-.green {
-  fill: green !important;
+.currentNode {
+  animation-name: green;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes green {
+  0% {fill: white}
+  50% {fill: #FFFF66}
+  100% {fill: white}
 }

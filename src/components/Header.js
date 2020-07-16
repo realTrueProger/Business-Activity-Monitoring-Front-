@@ -8,12 +8,11 @@ import BpmConfig from "./BpmConfig";
 
 const useStyles = makeStyles(() => ({
     paper: {
-        paddingLeft: '5px',
-        marginTop: '1em',
+        paddingBottom: '10px',
+        marginTop: '5px',
     },
     header: {
         margin: '5px',
-        marginRight: '20px',
     },
     lastGrid: {
         marginLeft: 'auto',
@@ -28,7 +27,7 @@ const Header = () => {
     return (
         <div>
             <Paper className={classes.paper}>
-                <Grid container spacing={2} alignItems={'center'}>
+                <Grid container spacing={1} alignItems={'center'}>
                     <Grid item>
                         <h1 className={classes.header}>BAM prototype UI</h1>
                     </Grid>

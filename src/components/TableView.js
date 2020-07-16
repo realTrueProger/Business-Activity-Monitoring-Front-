@@ -1,5 +1,5 @@
 /*eslint-disable react/display-name*/
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux'
 import {useParams, useHistory, Link} from 'react-router-dom';
 import {getIncidents} from "../actions/getIncidents";
@@ -25,17 +25,39 @@ import {apiUrl} from "../../config";
 const TableView = () => {
     let {id = "", table = 'definitions', insId = ""} = useParams();
     let variables = useSelector(state => state.variables.rows) || [];
+    let activities = useSelector(state => state.activities.rows) || [];
     const dispatch = useDispatch();
-
     const rows = useSelector(state => state[table].rows);
     const loading = useSelector(state => state[table].loading);
+    let [currentNode, setCurrentNode] = useState(null);
+    let activeNode;
 
+    // temp solution for getting id from incident table (there are two links from it)
     if (useHistory().location.state) {
         const fromIncident = useHistory().location.state.fromIncident;
         console.log(fromIncident);
         insId = id;
         id = "";
     }
+
+    const getCurrentNode = (id, nodes) => {
+        let tempRows;
+
+        if (nodes) {
+            tempRows = nodes.filter(row => row.processInstanceId === id);
+        } else {
+            tempRows = activities.filter(row => row.processInstanceId === id);
+        }
+
+        for (let row of tempRows) {
+            if (row.id.startsWith('SubProcess')) continue;
+            if (row.endTime === null) {
+                setCurrentNode(row.activityId);
+                activeNode = row.activityId;
+                break;
+            }
+        }
+    };
 
     useEffect(() => {
         switch (table) {
@@ -61,18 +83,35 @@ const TableView = () => {
         }
     }, [table]);
 
+    // clear schema
     useEffect(() => {
         dispatch(setSchema(null, {}));
     }, [table]);
+
+
+    // set current activity
+    useEffect(() => {
+        if (table === 'activities' && activities.length !== 0) {
+            getCurrentNode(id);
+        }
+    }, [table, activities]);
+
+    useEffect(() => {
+        if(table === 'activities' && !id) {
+            setCurrentNode(null);
+        }
+    }, [table, id]);
 
     const showSchema = (id) => {
         axios.get(`${apiUrl}/processDefinitions/xml/${id}`)
             .then(res => dispatch(setSchema(res.data.xml)));
     };
 
-    const showHeatmap = (definitionId, activities) => {
+    const showHeatmap = (definitionId, activities, id) => {
         let activitiesDurations = {};
         let maxDuration = 0;
+
+        getCurrentNode(id, activities);
 
         activities.forEach(activity => {
             activitiesDurations[activity.activityId] = activity.durationInMillis;
@@ -81,6 +120,8 @@ const TableView = () => {
                 maxDuration = activity.durationInMillis;
             }
         });
+
+        activitiesDurations._CURRENTNODE = activeNode;
 
         axios.get(`${apiUrl}/processDefinitions/xml/${definitionId}`)
             .then(res => dispatch(setSchema(res.data.xml, activitiesDurations)));
@@ -190,7 +231,7 @@ const TableView = () => {
                     title: 'heatMap',
                     field: 'getActivities',
                     render: rowData => <Button
-                        onClick={() => showHeatmap(rowData.definitionId, rowData.activityInstancesById)}
+                        onClick={() => showHeatmap(rowData.definitionId, rowData.activityInstancesById, rowData.id)}
                         variant="contained"
                         color="primary">heatMap</Button>
                 },
@@ -350,7 +391,10 @@ const TableView = () => {
                     options={{
                         filtering: true,
                         pageSize: 10,
-                        draggable: false
+                        draggable: false,
+                        rowStyle: rowData => ({
+                            backgroundColor: (rowData.activityId === currentNode) ? '#FFFF66' : 'white',
+                        })
                     }}
                     isLoading={loading}
                     detailPanel={showPanel()}

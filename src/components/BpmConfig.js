@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
     },
     marginInput: {
         marginTop: '5px',
-        minWidth: '225px',
+        // minWidth: '225px',
     }
 }));
 

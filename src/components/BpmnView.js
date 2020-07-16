@@ -20,34 +20,42 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
+export const percent = (percent, total) => {
+    return Number(((percent / 100) * total).toFixed());
+};
+
+export const buildHeatMap = (nodesRegistry, nodesDurations) => {
+    let p20 = percent(20, nodesDurations._MAX);
+    let p80 = percent(80, nodesDurations._MAX);
+
+    for (const [node, time] of Object.entries(nodesDurations)) {
+        if (node === '_MAX' || node.startsWith('SubProcess')) continue;
+        if (node === '_CURRENTNODE') {
+            let el = nodesRegistry._elements[time].gfx.firstChild.firstChild;
+            el.classList.add('currentNode');
+            continue;
+        }
+
+        let nodeSvgElement = nodesRegistry._elements[node].gfx.firstChild.firstChild;
+
+        if (time < p20) {
+            nodeSvgElement.style.fill = 'green';
+        }
+        if (time >= p20 && time <= p80) {
+            nodeSvgElement.style.fill = 'yellow';
+        }
+        if (time >= p80) {
+            nodeSvgElement.style.fill = 'red';
+        }
+    }
+};
+
 const BpmnView = () => {
     const classes = useStyles();
     const container = React.createRef();
     let schema = useSelector(state => state.schema.schema);
     let durations = useSelector(state => state.schema.durations);
 
-    const percent = (percent, total) => {
-        return ((percent / 100) * total).toFixed();
-    };
-
-    const buildHeatMap = (nodesRegistry, nodesDurations) => {
-        let p20 = percent(20, nodesDurations._MAX);
-        let p80 = percent(80, nodesDurations._MAX);
-
-        for (const [node, time] of Object.entries(nodesDurations)) {
-            if (node === '_MAX' || node.startsWith('SubProcess')) continue;
-
-            if (time < p20) {
-                nodesRegistry._elements[node].gfx.firstChild.firstChild.style.fill = 'green';
-            }
-            if (time >= p20 && time <= p80) {
-                nodesRegistry._elements[node].gfx.firstChild.firstChild.style.fill = 'yellow';
-            }
-            if (time >= p80) {
-                nodesRegistry._elements[node].gfx.firstChild.firstChild.style.fill = 'red';
-            }
-        }
-    };
 
     useEffect(() => {
         if (schema) {
