@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { apiUrl } from "../../config";
+import api from "../../api-config";
 
 export const getInstances = () => {
     return dispatch => {
         dispatch(getInstancesStarted());
 
         return axios
-            .get(`${apiUrl}/processInstances`)
+            .get(`${api.apiUrl}/processInstances`)
             .then(res => {
                 dispatch(getInstancesSuccess(res.data));
             })

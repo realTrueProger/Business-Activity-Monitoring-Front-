@@ -8,6 +8,11 @@ import {getTasks} from "../../actions/getTasks";
 import {getUsers} from "../../actions/getUsers";
 import {getVariables} from "../../actions/getVariables";
 jest.setTimeout(15000);
+import api from '../../../api-config';
+
+if(process.env.API_URL) {
+    api.setApi(process.env.API_URL);
+}
 
 const mockStore = configureStore([thunk]);
 

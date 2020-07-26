@@ -2,16 +2,14 @@ import React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import TableView from "../components/TableView";
 import Header from "../components/Header";
-import StatusBar from "../components/StatusBar";
-import BpmnView from "../components/BpmnView";
 import Container from "@material-ui/core/Container";
+import {SnackbarProvider} from 'notistack';
 
 const AppRouter = () => (
     <BrowserRouter>
-        <Container maxWidth={false}>
+        <SnackbarProvider maxSnack={10}>
+            <Container maxWidth={false}>
                 <Header/>
-                <StatusBar/>
-                <BpmnView/>
                 <Switch>
                     <Route path="/" exact={true}>
                         <TableView/>
@@ -23,7 +21,8 @@ const AppRouter = () => (
                         <TableView/>
                     </Route>
                 </Switch>
-        </Container>
+            </Container>
+        </SnackbarProvider>
     </BrowserRouter>
 );
 

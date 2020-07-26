@@ -3,7 +3,7 @@ import {TextField} from "@material-ui/core";
 import {Button} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import axios from 'axios';
-import {apiUrl} from "../../config";
+import api from "../../api-config";
 
 const useStyles = makeStyles(() => ({
     marginButton: {
@@ -21,15 +21,15 @@ const BpmConfig = () => {
     const [engineUrl, setEngineUrl] = useState('fetching data...');
     const [syncTime, setSyncTime] = useState('fetching data...');
     const updateEngineUrl = () => {
-        axios.get(`${apiUrl}/engine?address=${engineUrl}`).then(res => console.log(res))
+        axios.get(`${api.apiUrl}/engine?address=${engineUrl}`).then(res => console.log(res))
     };
     const updateSyncTime = () => {
-        axios.get(`${apiUrl}/engine?sync=${syncTime}`).then(res => console.log(res))
+        axios.get(`${api.apiUrl}/engine?sync=${syncTime}`).then(res => console.log(res))
     };
 
     useEffect(() => {
-        axios.get(`${apiUrl}/engine/address`).then(res => setEngineUrl(res.data));
-        axios.get(`${apiUrl}/engine/sync`).then(res => setSyncTime(res.data));
+        axios.get(`${api.apiUrl}/engine/address`).then(res => setEngineUrl(res.data));
+        axios.get(`${api.apiUrl}/engine/sync`).then(res => setSyncTime(res.data));
     }, []);
 
     return (

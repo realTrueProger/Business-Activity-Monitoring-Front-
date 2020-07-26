@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { apiUrl } from "../../config";
+import api from "../../api-config";
 
 export const getDefinitions = () => {
     return dispatch => {
         dispatch(getDefinitionsStarted());
 
         return axios
-            .get(`${apiUrl}/processDefinitions`)
+            .get(`${api.apiUrl}/processDefinitions`)
             .then(res => {
                 dispatch(getDefinitionsSuccess(res.data));
             })

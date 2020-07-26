@@ -24,6 +24,13 @@ export default (state = initialState, action) => {
                 loading: false,
                 error: action.payload.error
             };
+        case 'UPDATE_SINGLE_INSTANCE':
+            return {
+                ...state,
+                rows: state.rows.map(item => {
+                    return item.id === action.updated.id ? action.updated : item;
+                })
+            };
         default:
             return state;
     }

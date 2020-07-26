@@ -10,6 +10,7 @@ import {getUsers} from "../actions/getUsers";
 import {getActivities} from "../actions/getActivities";
 import {getVariables} from "../actions/getVariables";
 import {setSchema} from "../actions/setSchema";
+import {updateCurrentInstance} from "../actions/updateSingleInstance";
 import MaterialTable from "material-table";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -20,9 +21,25 @@ import TableRow from '@material-ui/core/TableRow';
 import Button from "@material-ui/core/Button";
 import ErrorBoundary from "./ErrorBoundary";
 import axios from 'axios';
-import {apiUrl} from "../../config";
+import api from "../../api-config";
+import {useSnackbar} from 'notistack';
+import StatusBar from "./StatusBar";
+import BpmnView from "./BpmnView";
+import Container from "@material-ui/core/Container";
 
 const TableView = () => {
+    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+    const snackBarOptions = {
+        variant: 'warning',
+        anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'right',
+        },
+        preventDuplicate: true,
+        persist: true,
+        transitionDuration: {enter: 2000, exit: 2000},
+    };
+
     let {id = "", table = 'definitions', insId = ""} = useParams();
     let variables = useSelector(state => state.variables.rows) || [];
     let activities = useSelector(state => state.activities.rows) || [];
@@ -59,7 +76,7 @@ const TableView = () => {
         }
     };
 
-    useEffect(() => {
+    useEffect(function updateData() {
         switch (table) {
             case 'incidents':
                 dispatch(getIncidents());
@@ -83,27 +100,71 @@ const TableView = () => {
         }
     }, [table]);
 
-    // clear schema
-    useEffect(() => {
+    useEffect(function clearSchema() {
         dispatch(setSchema(null, {}));
     }, [table]);
 
+    useEffect(function renderPopup() {
+        if (table === 'definitions') {
+            axios.get(`${api.apiUrl}/incidents/updates?seconds=3200000`)
+                .then(({data}) => {
+                    if (data) {
+                        data.forEach(({type, message, activityId, createTime, processInstanceId}) => {
+                            const action = key => (
+                                <>
+                                    <Button style={{'marginRight': '10px'}} variant="contained" color="primary">
+                                        <Link className={'button-link'}
+                                              to={{
+                                                  pathname: `/instances/${processInstanceId}`,
+                                                  state: {fromIncident: true}
+                                              }}>
+                                            &apos;Instance&apos;
+                                        </Link>
+                                    </Button>
 
-    // set current activity
-    useEffect(() => {
+                                    <Button variant="contained" color="primary" onClick={() => {
+                                        closeSnackbar(key)
+                                    }}>
+                                        &apos;Hide&apos;
+                                    </Button>
+                                </>
+                            );
+
+                            const msg = `New incident!
+                             Type: '${type}' 
+                             Message: '${message}'
+                             Created: '${createTime}'
+                             ActivityID: '${activityId}'`;
+
+                            enqueueSnackbar(msg, {
+                                ...snackBarOptions,
+                                action,
+                                onEntered: () => {
+                                    setTimeout(() => {
+                                        closeSnackbar(this)
+                                    }, 5000);
+                                }
+                            });
+                        })
+                    }
+                });
+        }
+    }, [table]);
+
+    useEffect(function setCurrentActivity() {
         if (table === 'activities' && activities.length !== 0) {
             getCurrentNode(id);
         }
     }, [table, activities]);
 
-    useEffect(() => {
-        if(table === 'activities' && !id) {
+    useEffect(function clearCurrentNode() {
+        if (table === 'activities' && !id) {
             setCurrentNode(null);
         }
     }, [table, id]);
 
     const showSchema = (id) => {
-        axios.get(`${apiUrl}/processDefinitions/xml/${id}`)
+        axios.get(`${api.apiUrl}/processDefinitions/xml/${id}`)
             .then(res => dispatch(setSchema(res.data.xml)));
     };
 
@@ -123,8 +184,21 @@ const TableView = () => {
 
         activitiesDurations._CURRENTNODE = activeNode;
 
-        axios.get(`${apiUrl}/processDefinitions/xml/${definitionId}`)
+        axios.get(`${api.apiUrl}/processDefinitions/xml/${definitionId}`)
             .then(res => dispatch(setSchema(res.data.xml, activitiesDurations)));
+    };
+
+    const updateSingleInstance = (id) => {
+        axios.get(`${api.apiUrl}/update/${id}`)
+            .then(res => {
+                if (res.status === 200) {
+                    return axios.get(`${api.apiUrl}/processInstances/${id}`)
+                }
+            })
+            .then(({data}) => {
+                dispatch(updateCurrentInstance(data));
+            })
+            .catch(err => console.log(err))
     };
 
     const tableData = {
@@ -217,6 +291,15 @@ const TableView = () => {
                         </Link>
                 },
                 {
+                    title: 'update',
+                    field: 'update',
+                    render: rowData => <Button
+                        onClick={() => updateSingleInstance(rowData.id)}
+                        variant="contained"
+                        color="primary">update</Button>
+                },
+                {title: 'lastSyncTime', field: 'lastSyncTime'},
+                {
                     title: 'getActivities',
                     field: 'getActivities',
                     render: rowData =>
@@ -248,7 +331,6 @@ const TableView = () => {
                 {title: 'startActivityId', field: 'startActivityId'},
                 {title: 'stateId', field: 'stateId'},
                 {title: 'rootProcessInstanseId', field: 'rootProcessInstanseId'},
-                {title: 'lastSyncTime', field: 'lastSyncTime'},
             ],
         },
         users: {
@@ -383,6 +465,8 @@ const TableView = () => {
     return (
         <>
             <ErrorBoundary>
+                {table === 'definitions' && <StatusBar />}
+                <BpmnView/>
                 <MaterialTable
                     key={tableData[table].name}
                     title={tableData[table].name}

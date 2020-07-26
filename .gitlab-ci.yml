@@ -1,47 +1,89 @@
 image: node:latest
-
+    
 stages:
-  - installDependencies
   - build
   - test
   - check
-
-installDependencies:
-  stage: installDependencies
-  script:
-    - echo "Installing deps"
-    - cd prototype-bam-system-frontend/
-    - npm install
-  artifacts:
-    paths:
-      - prototype-bam-system-frontend/node_modules/
-    expire_in: 1 day
-
-build:
+  - deploy
+  - acceptance
+  - system
+   
+build_frontend:
   stage: build
   script:
-    - echo "Building deploy package"
     - cd prototype-bam-system-frontend/
     - npm install
-    - npm build
-    - echo "Build successful"
+    - API_URL=http://$STAGE_SERVER_ADDRESS:8081 npm run build
   artifacts:
     expire_in: 1 hour
     paths:
-      - prototype-bam-system-frontend/public
+      - prototype-bam-system-frontend/
 
-test:
+test_unit_frontend:
   stage: test
+  needs: [build_frontend]
+  dependencies:
+    - build_frontend
   script:
-    - echo "Start tests"
     - cd prototype-bam-system-frontend/
-    - npm install
-    - npm test
+    - npm test -- src/tests/heatmaps/BpmnView.test.js src/tests/reducers/reducers.test.js
 
-check:
+check_frontend:
   stage: check
+  dependencies:
+    - build_frontend
   script:
-    - echo "Start code static check"
     - cd prototype-bam-system-frontend/
-    - npm install
     - npm run lint
+
+deploy_stage:
+  image: ubuntu:latest
+  stage: deploy
+  dependencies:
+    - build_frontend
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq rsync
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - rsync -rtv -e "ssh -o StrictHostKeyChecking=no" ./prototype-bam-system-frontend $STAGE_SERVER_USER@$STAGE_SERVER_ADDRESS:.
+    - ssh -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_ADDRESS "sudo kill -9 `ps aux | pgrep -lf node | awk {'print $1'}`" || true
+    - ssh -o StrictHostKeyChecking=no $STAGE_SERVER_USER@$STAGE_SERVER_ADDRESS 'cd ./prototype-bam-system-frontend/ && setsid nohup sudo npm start &' &
+    - sleep 20
+  only:
+    - stage
+
+test_acceptance_frontend:
+  stage: acceptance
+  dependencies:
+    - build_frontend
+  script:
+    - cd prototype-bam-system-frontend/
+    - API_URL=http://$STAGE_SERVER_ADDRESS:8081 npm test -- src/tests/actions/fetchActions.test.js
+  only: 
+    - stage
+
+test_stress_frontend:
+  image: node:8-alpine
+  stage: system
+  script:
+    - npm install -g artillery@1.6.0-2
+    - artillery quick --count 10 -n 20 http://$STAGE_SERVER_ADDRESS
+  only:
+    - stage
+
+deploy_production:
+  stage: deploy
+  dependencies:
+    - build_frontend
+  script:
+    - cd prototype-bam-system-frontend/
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=$HEROKU_FRONTEND_APP_NAME --api-key=$HEROKU_FRONTEND_API_KEY --strategy=api 
+  only:
+    - master

@@ -4,7 +4,7 @@
   "main": "index.js",
   "author": "Vladimir Solovev",
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
+    "build": "cross-env webpack --env.API_URL=$API_URL --config webpack.prod.js",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "test": "jest",
     "serve": "node server/server.js",
@@ -22,11 +22,14 @@
     "@material-ui/icons": "^4.9.1",
     "axios": "^0.19.2",
     "bpmn-js": "^7.2.0",
+    "chart.js": "^2.9.3",
     "express": "^4.17.1",
     "material-table": "^1.60.0",
     "normalize.css": "7.0.0",
+    "notistack": "^0.9.17",
     "ramda": "^0.27.0",
     "react": "^16.13.1",
+    "react-chartjs-2": "^2.9.0",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
@@ -43,6 +46,7 @@
     "@babel/preset-react": "^7.10.1",
     "babel-jest": "^26.0.1",
     "babel-loader": "^8.1.0",
+    "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",
     "eslint": "^7.3.1",
     "eslint-plugin-react": "^7.20.3",
@@ -57,6 +61,7 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "yargs": "^15.4.1"
   }
 }

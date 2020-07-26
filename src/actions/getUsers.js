@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { apiUrl } from "../../config";
+import api from "../../api-config";
 
 export const getUsers = () => {
     return dispatch => {
         dispatch(getUsersStarted());
 
         return axios
-            .get(`${apiUrl}/users`)
+            .get(`${api.apiUrl}/users`)
             .then(res => {
                 dispatch(getUsersSuccess(res.data));
             })

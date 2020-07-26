@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { apiUrl } from "../../config";
+import api from "../../api-config";
 
 export const getTasks = () => {
     return dispatch => {
         dispatch(getTasksStarted());
 
         return axios
-            .get(`${apiUrl}/tasks`)
+            .get(`${api.apiUrl}/tasks`)
             .then(res => {
                 dispatch(getTasksSuccess(res.data));
             })
