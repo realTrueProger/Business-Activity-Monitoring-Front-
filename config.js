@@ -1,1 +1,0 @@
-export const apiUrl = 'https://bam-back-end-api.herokuapp.com';

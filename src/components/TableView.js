@@ -25,7 +25,6 @@ import api from "../../api-config";
 import {useSnackbar} from 'notistack';
 import StatusBar from "./StatusBar";
 import BpmnView from "./BpmnView";
-import Container from "@material-ui/core/Container";
 
 const TableView = () => {
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();

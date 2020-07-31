@@ -1,46 +1,44 @@
+/*eslint-disable react/prop-types*/
 import React, {useEffect, useRef} from "react";
 import Chart from "chart.js";
 
 
-const RoundChart = ({title, total}) => {
+const RoundChart = ({title, total, labels, counts}) => {
     const canvas = useRef();
 
     useEffect(() => {
-        const ctx = canvas.current.getContext('2d');
+        if(labels && counts) {
+            const ctx = canvas.current.getContext('2d');
 
-        new Chart(ctx, {
-            // The type of chart we want to create
-            type: 'doughnut',
+            new Chart(ctx, {
+                type: 'doughnut',
 
-            // The data for our dataset
-            data: {
-                datasets: [{
-                    data: [
-                        10,
-                        20,
-                        30
-                    ],
-                    backgroundColor: [
-                        '#4dc9f6',
-                        '#f67019',
-                        '#f53794',
-                    ],
-                }],
-                labels: [
-                    'Red',
-                    'Orange',
-                    'Yellow',
-                ]
-            },
+                data: {
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: [
+                            '#4dc9f6',
+                            '#f67019',
+                            '#f53794',
+                            '#537bc4',
+                            '#acc236',
+                            '#166a8f',
+                            '#00a950',
+                            '#58595b',
+                            '#8549ba'
+                        ],
+                    }],
+                    labels: labels
+                },
 
-            // Configuration options go here
-            options: {
-                legend: {
-                    display: false
+                options: {
+                    legend: {
+                        display: false
+                    }
                 }
-            }
-        });
-    }, [total]);
+            });
+        }
+    } );
 
     return (
         <div>
